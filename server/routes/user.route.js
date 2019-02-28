@@ -11,13 +11,13 @@ userRouter.route({
     method: 'post',
     path: '/',
     handler: async (ctx) => {
-      await insert(ctx.request, ctx.response);
+      await insert(ctx);
     }
   }
 );
 
 
-async function insert(req, res) {
-  let user = await userCtrl.insert(req.body);
-  res.json(user);
+async function insert(ctx) {
+  let user = await userCtrl.insert(ctx.request.body);
+  ctx.response.body = { user };
 }
