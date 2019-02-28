@@ -1,15 +1,20 @@
-const express = require('express');
-const passport = require('passport');
-const asyncHandler = require('express-async-handler');
+const router = require('koa-router');
+const passport = require('koa-passport');
 const userCtrl = require('../controllers/user.controller');
 
-const router = express.Router();
-module.exports = router;
+const userRouter = router();
+module.exports = userRouter;
 
-router.use(passport.authenticate('jwt', { session: false }))
+userRouter.use(passport.authenticate('jwt', { session: false }))
 
-router.route('/')
-  .post(asyncHandler(insert));
+userRouter.route({
+    method: 'post',
+    path: '/',
+    handler: async (ctx) => {
+      await insert(ctx.request, ctx.response);
+    }
+  }
+);
 
 
 async function insert(req, res) {

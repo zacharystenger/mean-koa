@@ -1,28 +1,48 @@
-const express = require('express');
-const asyncHandler = require('express-async-handler')
-const passport = require('passport');
+const Router = require('koa-router');
+const passport = require('koa-passport');
 const userCtrl = require('../controllers/user.controller');
 const authCtrl = require('../controllers/auth.controller');
 const config = require('../config/config');
 
-const router = express.Router();
-module.exports = router;
+const authRouter = new Router();
+module.exports = authRouter;
 
-router.post('/register', asyncHandler(register), login);
-router.post('/login', passport.authenticate('local', { session: false }), login);
-router.get('/me', passport.authenticate('jwt', { session: false }), login);
+authRouter.post(
+  '/register',
+  async (ctx, next) => {
+    await register(ctx, next);
+  },
+  (ctx) => {
+    login(ctx);
+  }
+);
+authRouter.post(
+  '/login',
+  passport.authenticate('local', { session: false }),
+  (ctx) => {
+    login(ctx);
+  }
+);
+authRouter.get(
+  '/me',
+  passport.authenticate('jwt', { session: false }),
+  (ctx) => {
+    login(ctx);
+  }
+);
 
-
-async function register(req, res, next) {
-  let user = await userCtrl.insert(req.body);
+// ctx.req is Node's req object
+// ctx.request is Koa's Request object
+async function register(ctx, next) {
+  let user = await userCtrl.insert(ctx.request.body);
   user = user.toObject();
   delete user.hashedPassword;
-  req.user = user;
+  ctx.req.user = user;
   next()
 }
 
-function login(req, res) {
-  let user = req.user;
+function login(ctx) {
+  let user = ctx.req.user;
   let token = authCtrl.generateToken(user);
-  res.json({ user, token });
+  ctx.response.body = { user, token };
 }

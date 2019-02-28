@@ -1,6 +1,6 @@
 // config should be imported before importing any other file
 const config = require('./config/config');
-const app = require('./config/express');
+const app = require('./config/koa');
 require('./config/mongoose');
 
 // module.parent check is required to support mocha watch

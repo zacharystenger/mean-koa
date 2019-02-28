@@ -1,15 +1,15 @@
-const express = require('express');
+const Router = require('koa-router');
 const userRoutes = require('./user.route');
 const authRoutes = require('./auth.route');
 
-const router = express.Router(); // eslint-disable-line new-cap
+const indexRouter = new Router();
 
 /** GET /health-check - Check service health */
-router.get('/health-check', (req, res) =>
+indexRouter.get('/api/health-check', (req, res) =>
   res.send('OK')
 );
 
-router.use('/auth', authRoutes);
-router.use('/user', userRoutes);
+indexRouter.use('/api/auth', authRoutes.routes());
+indexRouter.use('/api/user', userRoutes.routes());
 
-module.exports = router;
+module.exports = indexRouter;
